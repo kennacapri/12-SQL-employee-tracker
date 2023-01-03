@@ -32,5 +32,80 @@ afterConnection = () => {
   console.log("*        EMPLOYEE TRACKER         *");
   console.log("*                                 *");
   console.log("***********************************");
-//   promptUser();
+
 };
+const Department = require("./Department");
+
+class Role {
+    constructor(title, salary) {
+        this.title = title;
+        this.salary = salary;
+        this.department = new Department();
+    }
+}
+
+module.exports = Role;
+
+const Role = require("./Role");
+
+class Employee {
+    constructor(first_name, last_name) {
+        this.first_name = first_name;
+        this.last_name = last_name;
+    }
+}
+class Department {
+    constructor(name) {
+        this.name = name;
+    }
+}
+
+module.exports = Department;
+
+
+async function start() {
+  try {
+    const todo = await inquirer.prompt({
+      type: "list",
+      message: "What would you like to do?",
+      name: "userChoice",
+      choices: [
+        "View all Employees",
+        "View all Employees by Department",
+        "Add Employee",
+        "Add Role",
+        "Add Department",
+      ],
+    });
+    const { userChoice } = todo;
+    switch (userChoice) {
+      case "View all Employees":
+        await helpers.viewAll(connection);
+        await start();
+        break;
+      case "View all Employees by Department":
+        await helpers.viewByDept(connection);
+        await start();
+        break;
+      case "Add Employee":
+        await helpers.addEmployee(connection);
+        await start();
+        break;
+      case "Add Role":
+        await helpers.addRole(connection);
+        await start();
+        break;
+        
+      case "Add Dept":
+        await helpers.addDept(connection);
+        await start();
+        break;
+
+      default:
+        break;
+    }
+    return userChoice;
+  } catch (err) {
+    throw err;
+  }
+}
