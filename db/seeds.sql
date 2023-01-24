@@ -1,6 +1,6 @@
 INSERT INTO department (name)
 VALUES  ('Accounting'), 
-        ('Administratiion'), 
+        ('Administration'), 
         ('Engineering'), 
         ('Human Resources'), 
         ('Maintenance');
@@ -15,7 +15,7 @@ VALUES  ('Manager', 150000, 1),
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES  ('John', 'Williams', 1, 1), 
         ('Tim', 'Burton', 2, 2), 
-        ('Stephen', 'Speilberg', 3, 3), 
+        ('Steven', 'Spielberg', 3, 3), 
         ('Hans', 'Zimmer', 4, null), 
         ('John', 'Hughes', 5, 5);
 

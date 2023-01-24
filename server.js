@@ -16,14 +16,12 @@ const connection = mysql.createConnection({
   database: "employee_db",
 });
 
-
 // throw error if connection fails, if successful log connection in console log
 connection.connect((err) => {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
   afterConnection();
 });
-
 
 // welcome message once connection is established
 afterConnection = () => {
@@ -34,7 +32,6 @@ afterConnection = () => {
   console.log("***********************************");
   promptUser();
 };
-
 
 // initial prompt to user from list with choices
 const promptUser = () => {
@@ -52,6 +49,7 @@ const promptUser = () => {
           "Add a role",
           "Add an employee",
           "Update an employee role",
+          "Delete a department",
           "No Action",
         ],
       },
@@ -87,8 +85,12 @@ const promptUser = () => {
         updateEmployee();
       }
 
+      if (choices === "Delete a department") {
+        deleteDepartment();
+      }
+
       if (choices === "No Action") {
-        connection.end();
+        promptUser();
       }
     });
 };
@@ -289,7 +291,7 @@ addEmployee = () => {
       },
     ])
     .then((answer) => {
-      const params = [answer.fistName, answer.lastName];
+      const params = [answer.firstName, answer.lastName];
 
       // grab roles from roles table
       const roleSql = `SELECT role.id, role.title FROM role`;
@@ -420,5 +422,39 @@ updateEmployee = () => {
             });
         });
       });
+    const deleteDepartment = () => {
+      inquirer
+        .prompt([
+          {
+            type: "list",
+            name: "department",
+            message: "Which department would you like to delete?",
+            choices: [
+              "Accounting",
+              "Administration",
+              "Engineering",
+              "Human Resources",
+              "Maintenance",
+            ],
+          },
+        ])
+        .then((answers) => {
+          const { department } = answers;
+          const sql = `DELETE FROM department WHERE name = ?`;
+          connection
+            .promise()
+            .query(sql, [department])
+            .then(([result]) => {
+              console.log(`Deleted ${result.affectedRows} department`);
+              promptUser();
+            })
+            .catch((err) => {
+              console.error(err);
+            });
+        });
+    };
+    if (choices === "Delete a department") {
+      deleteDepartment();
+    }
   });
 };
