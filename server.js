@@ -8,7 +8,6 @@ const cTable = require("console.table");
 // requires dotenv file so the password isn't saved
 require("dotenv").config();
 
-
 // connect to database
 const connection = mysql.createConnection({
   host: "127.0.0.1", // this was changed from 'localhost' because of use with macOS
@@ -17,14 +16,12 @@ const connection = mysql.createConnection({
   database: "employee_tracker_db",
 });
 
-
 // throw error if connection fails, if successful log connection in console log
 connection.connect((err) => {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
   afterConnection();
 });
-
 
 // welcome message once connection is established
 afterConnection = () => {
@@ -35,8 +32,6 @@ afterConnection = () => {
   console.log("***********************************");
 
 };
-
-
 
 async function start() {
   try {
@@ -55,25 +50,19 @@ async function start() {
     const { userChoice } = todo;
     switch (userChoice) {
       case "View all Employees":
-        await helpers.viewAll(connection);
-        await start();
+        await viewAll(connection);
         break;
       case "View all Employees by Department":
-        await helpers.viewByDept(connection);
-        await start();
+        await viewByDept(connection);
         break;
       case "Add Employee":
-        await helpers.addEmployee(connection);
-        await start();
+        await addEmployee(connection);
         break;
       case "Add Role":
-        await helpers.addRole(connection);
-        await start();
+        await addRole(connection);
         break;
-        
       case "Add Dept":
-        await helpers.addDept(connection);
-        await start();
+        await addDept(connection);
         break;
 
       default:
@@ -85,7 +74,7 @@ async function start() {
   }
 }
 
-async function viewAll(cntn) {
+async function viewAll() {
     try {
       let query =
         "SELECT employees.id, employees.first_name, employees.last_name, roles.title, ";
@@ -95,7 +84,7 @@ async function viewAll(cntn) {
       query += "INNER JOIN employees ON employees.role_id = roles.id ";
       query += "ORDER BY employees.id ASC";
       console.log("Viewing all employees... \n");
-      await cntn.query(query, (err, res) => {
+      await connection.query(query, (err, res) => {
         if (err) throw err;
         console.log("\n");
         console.table(res);
@@ -105,7 +94,7 @@ async function viewAll(cntn) {
     }
   }
 
-  async function viewByDept(cntn) {
+  async function viewByDept() {
     try {
       const selectDept = await inquirer.prompt({
         type: "list",
@@ -126,7 +115,7 @@ async function viewAll(cntn) {
       query += "WHERE roles.department_id = " + deptChoice;
       query += " ORDER BY employees.id ASC";
 
-      await cntn.query(query, (err, res) => {
+      await connection.query(query, (err, res) => {
         if (err) throw err;
         console.log("\n");
         console.table(res);
@@ -149,7 +138,7 @@ async function viewAll(cntn) {
     }
   }
 
-  async function addEmployee(cntn) {
+  async function addEmployee() {
     console.log("Adding another employee... \n");
 
     const newEmployee = await inquirer.prompt([
@@ -187,7 +176,7 @@ async function viewAll(cntn) {
     console.log(newEmployee);
 
     const { first_name, last_name, role_id, manager_id } = newEmployee;
-    cntn.query(
+    connection.query(
       "INSERT INTO employees SET ?",
       {
         first_name: first_name,
@@ -200,7 +189,7 @@ async function viewAll(cntn) {
         console.log(res.affectedRows + " employees inserted!\n");
       }
     );
-    await this.viewAll(cntn);
+    await this.viewAll(connection);
   }
 
   function handleRole(answer) {
@@ -226,7 +215,7 @@ async function viewAll(cntn) {
     }
   }
 
-  async function addRole(cntn) {
+  async function addRole() {
     console.log("Adding another role... \n");
 
     const newRole = await inquirer.prompt([
@@ -249,7 +238,7 @@ async function viewAll(cntn) {
       ]);
       console.log(newRole);
       const { title, department_id } = newRole;
-      cntn.query(
+      connection.query(
       "INSERT INTO roles SET ?",
       {
         title: title,
@@ -261,10 +250,10 @@ async function viewAll(cntn) {
         console.log(res.affectedRows + " role inserted!\n");
       }
     );
-    await this.viewAll(cntn);
+    await this.viewAll(connection);
   }
 
-  async function addDept(cntn) {
+  async function addDept() {
     console.log("Adding another department... \n");
     const newDept = await inquirer.prompt([
       {
@@ -290,7 +279,7 @@ async function viewAll(cntn) {
       ]);
       console.log(newDept);
       const { title, role_id } = newDept;
-      cntn.query(
+      connection.query(
       "INSERT INTO departments SET ?",
       {
         title: title,
@@ -302,9 +291,9 @@ async function viewAll(cntn) {
         console.log(res.affectedRows + " department inserted!\n");
       }
     );
-    await this.viewAll(cntn);
+    await this.viewAll(connection);
   }
 
 start();
- 
+
 
